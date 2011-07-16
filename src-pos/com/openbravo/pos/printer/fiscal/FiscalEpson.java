@@ -477,7 +477,7 @@ public class FiscalEpson {
 
     public void loadCommands() {
 
-        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("/home/wnasich/NetBeansProjects/ifepson/dist/ifepson.jar", "ifepson.commands");
+        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("lib/ifepson.jar", "ifepson.commands");
 
         Object obj = null;
         ifCommand com = null;
@@ -505,7 +505,7 @@ public class FiscalEpson {
 
         Logger.getLogger(FiscalEpson.class.getName()).log(Level.DEBUG, "El sistema operativo detectado es:" + GeneralFunc.getOS() + (GeneralFunc.is64OS() ? " 64bit" : " 32bit"));
 
-        String pathToAdd = "/home/wnasich/temp/helados_malabrigo/jpfbatch/home/prog/java/JPFBatch/rxtx/";
+        String pathToAdd = "lib/rxtx/";
 
         if (GeneralFunc.getOS().toLowerCase().contains("win")) {
             if (GeneralFunc.is64OS()) {
