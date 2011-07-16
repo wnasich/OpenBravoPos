@@ -10,6 +10,7 @@
 		</line>
 	</display>
 	<fiscalreceipt>
+		<line>@ABRIRCAJON1</line>
 		#if (${ticket.ticketType} == 0)
    		<!-- Cliente -->
    			#set ($customer = $ticket.getCustomer())
