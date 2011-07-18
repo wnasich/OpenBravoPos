@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<output>
+	<display>
+		<line>
+			<text align="left" length="10">Total.</text>
+			<text align="right" length="10">${ticket.printTotal()}</text>
+		</line>
+		<line>
+			<text align="center" length="20">Gracias por su compra.</text>
+		</line>
+	</display>
+	<fiscalreceipt>
+		<line>@ABRIRCAJON1</line>
+		#if (${ticket.ticketType} == 0)
+   		<!-- Cliente -->
+   			#set ($customer = $ticket.getCustomer())
+			#if ($customer && $customer.printTaxid())
+			<!-- Tiquet Factura -->
+				#set ($l_typeTicket = "TF")
+				<line>@FACTABRE|T|C|B|1|F|17|I|M|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+			#else
+			<!-- Tiquet -->
+				#set ($l_typeTicket = "TQ")
+				<line>@TIQUEABRE</line>
+			#end
+			#if ($place != "")
+				<line>@PONEENCABEZADO|3|Mesa: ${place}</line>
+			#else
+				<line>@PONEENCABEZADO|3|Expendio</line>
+			#end
+		#end
+		<line>@PONEENCABEZADO|4|Caja: ${ticket.printUser()}</line>
+		<!-- Reembolso -->
+		#if (${ticket.ticketType} == 1)
+		#end
+		<line>@AVANZATIQUE|1</line>
+		#foreach ($ticketline in $ticket.getLines())
+			#set ($productName = $ticketline.printName())
+			#if ($productName == "")
+				#set ($productName = "Articulo sin codigo")
+			#end
+			#if ($l_typeTicket == "TQ")
+				<line>@TIQUEITEM|${productName}|${ticketline.getMultiply()}|${ticketline.getPrice()}|21|M|1|0|0</line> 
+			#elseif($l_typeTicket == "TF")
+				<line>@FACTITEM|${productName}|${ticketline.getMultiply()}|${ticketline.getPrice()}|21|M|1|0|0</line> 
+			#end
+			#if ($ticketline.isProductCom()) 
+			#else
+			#end
+		#end
+		<line>@AVANZATIQUE|1</line>
+		#foreach ($paymentline in $ticket.payments)      
+			#if ($paymentline.name == "cash")
+				#if ($l_typeTicket == "TQ")
+					<line>@TIQUEPAGO|Efectivo|${paymentline.getPaid()}|T</line>
+				#elseif($l_typeTicket == "TF")
+					<line>@FACTPAGO|Efectivo|${paymentline.getPaid()}|T</line>
+				#end
+			#end
+			#if ($paymentline.name == "cashrefund")
+			#end
+			#if ($paymentline.name == "magcard")
+			#end  
+			#if ($paymentline.name == "magcardrefund")
+			#end
+			#if ($paymentline.name == "cheque")
+			#end
+			#if ($paymentline.name == "chequerefund")
+			#end
+			#if ($paymentline.name == "paperin")
+			#end
+			#if ($paymentline.name == "paperout")
+			#end
+			#if ($paymentline.name == "free")
+			#end
+			#if ($paymentline.name == "debt")
+			#end 
+		#end
+		#if (${ticket.ticketType} == 0)
+			#if ($l_typeTicket == "TQ")
+				<line>@TIQUECIERRA</line>
+			#elseif($l_typeTicket == "TF")
+				<line>@FACTCIERRA|T|B| </line>
+			#end
+		#end
+	</fiscalreceipt>
+	#foreach ($paymentline in $ticket.payments)      
+		#if ($paymentline.name == "cash")
+			<opendrawer/>
+		#end
+		#if ($paymentline.name == "cashrefund")
+			<opendrawer/>
+		#end  
+	#end
+</output>
