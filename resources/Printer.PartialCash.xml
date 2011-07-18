@@ -29,7 +29,7 @@
         </line>
         <line></line>
         <line>
-            <text bold="true">Pagos</text>
+            <text bold="true">Reporte de Pagos</text>
         </line>
         <line>
             <text align ="right" length="42">Total</text>
@@ -47,7 +47,7 @@
             <text>------------------------------------------</text>
         </line> 
         <line>
-            <text align ="left" length="32">Payments:</text>
+            <text align ="left" length="32">Pagos:</text>
             <text align ="right" length="10">${payments.printPayments()}</text>
         </line>
         <line></line>
@@ -57,7 +57,7 @@
         </line>
         <line></line>
         <line>
-            <text bold="true">Impuestos</text>
+            <text bold="true">Impuestos:</text>
         </line>
         <line>
             <text align ="right" length="42">Total</text>
