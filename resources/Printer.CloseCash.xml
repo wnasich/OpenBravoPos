@@ -19,17 +19,17 @@
     You should have received a copy of the GNU General Public License
     along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
  -->
-
 <output>
     <ticket>
         <image>Printer.Ticket.Logo</image>
         <line></line>
+        <line></line>
         <line size="1">
-            <text align ="center" length="42" bold="true">Close cash report</text>            
+            <text align ="center" length="42" bold="true">Reporte de Cierre de Caja</text>
         </line>
         <line></line>
         <line>
-            <text bold="true">Payments report</text>
+            <text bold="true">Reporte de Pagos</text>
         </line>
         <line>
             <text align ="right" length="42">Total</text>
@@ -47,7 +47,7 @@
             <text>------------------------------------------</text>
         </line> 
         <line>
-            <text align ="left" length="32">Payments:</text>
+            <text align ="left" length="32">Pagos</text>
             <text align ="right" length="10">${payments.printPayments()}</text>
         </line>
         <line></line>
@@ -57,7 +57,7 @@
         </line>
         <line></line>
         <line>
-            <text bold="true">Taxes report</text>
+            <text bold="true">Impuestos:</text>
         </line>
         <line>
             <text align ="right" length="42">Total</text>
@@ -75,7 +75,7 @@
             <text>------------------------------------------</text>
         </line>
         <line>
-            <text align ="left" length="32">Receipts:</text>
+            <text align ="left" length="32">Tickets:</text>
             <text align ="right" length="10">${payments.printSales()}</text>
         </line>
         <line></line>
@@ -90,19 +90,19 @@
         </line>
         <line></line>
         <line>
-            <text length="18">Machine:</text>
+            <text length="18">Terminal de Venta:</text>
             <text>${payments.printHost()}</text>
         </line>    
         <line>
-            <text length="18">Sequence:</text>
+            <text length="18">Secuencia:</text>
             <text length="24" align="right">${payments.printSequence()}</text>
         </line> 
         <line>
-            <text length="18">Start date:</text>
+            <text length="18">Fecha inicial:</text>
             <text length="24" align="right">${payments.printDateStart()}</text>
         </line>  
         <line>
-            <text length="18">End date:</text>
+            <text length="18">Fecha de fin:</text>
             <text length="24" align="right">${payments.printDateEnd()}</text>
         </line>  
     </ticket>
