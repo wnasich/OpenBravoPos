@@ -161,7 +161,7 @@ public class JPanelButtons extends javax.swing.JPanel {
             } else {
                 String value = attributes.getValue("value");
                 if (value != null) {                  
-                    props.setProperty(qName, attributes.getValue("value"));
+                    props.setProperty(qName, value);
                 }
             }
         }      
