@@ -89,8 +89,8 @@ public class ThumbNailBuilder {
         label.setBounds(0, 0, imgtext.getWidth(), imgtext.getHeight());
         
         // The background
-        Color c1 = new Color(0xff, 0xff, 0xff, 0x40);
-        Color c2 = new Color(0xff, 0xff, 0xff, 0xd0);
+        Color c1 = new Color(0xff, 0xff, 0xff, 0x10);
+        Color c2 = new Color(0xff, 0xff, 0xff, 0x30);
 
 //        Point2D center = new Point2D.Float(imgtext.getWidth() / 2, label.getHeight());
 //        float radius = imgtext.getWidth() / 3;
