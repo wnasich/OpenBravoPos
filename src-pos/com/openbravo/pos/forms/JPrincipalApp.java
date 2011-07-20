@@ -443,7 +443,7 @@ public class JPrincipalApp extends javax.swing.JPanel implements AppUserView {
 
         jButton1.setFocusPainted(false);
         jButton1.setFocusable(false);
-        jButton1.setMargin(new java.awt.Insets(14, 2, 14, 2));
+        jButton1.setMargin(new java.awt.Insets(14, 5, 14, 5));
         jButton1.setRequestFocusEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
