@@ -10,6 +10,19 @@
 		</line>
 	</display>
 	<fiscalreceipt>
+		<!-- Determinando tipo de Comprobante Fiscal a emitir -->
+		#set ($custFiscalChar = "")
+		#foreach ($taxinfo in $taxes)  
+			#set ($taxline = $ticket.getTaxLine($taxinfo))
+			#if ($taxline.getSubTotal() != 0)
+				#set ($custFiscalChar = $taxline.getTaxInfo().getLastCharName())
+			#end
+		#end 
+		#if ($custFiscaChar == "I")
+			#set ($letraComprobante = "A")
+		#else
+			#set ($letraComprobante = "B")
+		#end
 		<line>@ABRIRCAJON1</line>
 		#if (${ticket.ticketType} == 0)
    		<!-- Cliente -->
@@ -17,7 +30,7 @@
 			#if ($customer && $customer.printTaxid())
 			<!-- Tiquet Factura -->
 				#set ($l_typeTicket = "TF")
-				<line>@FACTABRE|T|C|B|1|F|17|I|M|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
 			#else
 			<!-- Tiquet -->
 				#set ($l_typeTicket = "TQ")
