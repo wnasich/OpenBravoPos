@@ -70,6 +70,10 @@ public class TaxInfo implements Serializable, IKeyed {
     public String getName() {
         return name;
     }
+
+    public char getLastCharName() {
+        return name.charAt(name.length()-1);
+    }
     
     public void setName(String value) {
         name = value;
