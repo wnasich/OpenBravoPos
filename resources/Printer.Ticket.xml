@@ -17,9 +17,11 @@
 			#if ($taxline.getSubTotal() != 0)
 				#set ($custFiscalChar = $taxline.getTaxInfo().getLastCharName())
 			#end
-		#end 
-		#if ($custFiscaChar == "I")
+		#end
+		#set ($discriminarIVA = false)
+		#if ($custFiscalChar == "I")
 			#set ($letraComprobante = "A")
+			#set ($discriminarIVA = true)
 		#else
 			#set ($letraComprobante = "B")
 		#end
@@ -52,10 +54,15 @@
 			#if ($productName == "")
 				#set ($productName = "Articulo sin codigo")
 			#end
+			#if ($discriminarIVA)
+				#set ($precioUnitario = ${ticketline.getPrice()})
+			#else
+				#set ($precioUnitario = ${ticketline.getPriceTax()})
+			#end
 			#if ($l_typeTicket == "TQ")
-				<line>@TIQUEITEM|${productName}|${ticketline.getMultiply()}|${ticketline.getPrice()}|21|M|1|0|0</line> 
+				<line>@TIQUEITEM|${productName}|${ticketline.getMultiply()}|${precioUnitario}|21|M|1|0|0</line>
 			#elseif($l_typeTicket == "TF")
-				<line>@FACTITEM|${productName}|${ticketline.getMultiply()}|${ticketline.getPrice()}|21|M|1|0|0</line> 
+				<line>@FACTITEM|${productName}|${ticketline.getMultiply()}|${precioUnitario}|21|M|1|0|0</line> 
 			#end
 			#if ($ticketline.isProductCom()) 
 			#else
@@ -97,12 +104,4 @@
 			#end
 		#end
 	</fiscalreceipt>
-	#foreach ($paymentline in $ticket.payments)      
-		#if ($paymentline.name == "cash")
-			<opendrawer/>
-		#end
-		#if ($paymentline.name == "cashrefund")
-			<opendrawer/>
-		#end  
-	#end
 </output>
