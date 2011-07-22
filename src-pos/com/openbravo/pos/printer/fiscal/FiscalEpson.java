@@ -477,7 +477,8 @@ public class FiscalEpson {
 
     public void loadCommands() {
 
-        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("lib/ifepson.jar", "ifepson.commands");
+        // Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("lib/ifepson.jar", "ifepson.commands");
+        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("/home/wnasich/NetBeansProjects/ifepson/dist/ifepson.jar", "ifepson.commands");
 
         Object obj = null;
         ifCommand com = null;
