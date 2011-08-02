@@ -38,17 +38,18 @@
 				#set ($l_typeTicket = "TQ")
 				<line>@TIQUEABRE</line>
 			#end
+			<!-- 
 			#if ($place != "")
-				<line>@PONEENCABEZADO|3|Mesa: ${place}</line>
+				<line>@LINEACOLA|1|Mesa: ${place}</line>
 			#else
-				<line>@PONEENCABEZADO|3|Expendio</line>
+				<line>@LINEACOLA|1|Expendio</line>
 			#end
+			-->
 		#end
-		<line>@PONEENCABEZADO|4|Caja: ${ticket.printUser()}</line>
+		<!-- <line>@LINEACOLA|2|Caja: ${ticket.printUser()}</line> -->
 		<!-- Reembolso -->
 		#if (${ticket.ticketType} == 1)
 		#end
-		<line>@AVANZATIQUE|1</line>
 		#foreach ($ticketline in $ticket.getLines())
 			#set ($productName = $ticketline.printName())
 			#if ($productName == "")
@@ -68,7 +69,6 @@
 			#else
 			#end
 		#end
-		<line>@AVANZATIQUE|1</line>
 		#foreach ($paymentline in $ticket.payments)      
 			#if ($paymentline.name == "cash")
 				#if ($l_typeTicket == "TQ")
@@ -77,24 +77,6 @@
 					<line>@FACTPAGO|Efectivo|${paymentline.getPaid()}|T</line>
 				#end
 			#end
-			#if ($paymentline.name == "cashrefund")
-			#end
-			#if ($paymentline.name == "magcard")
-			#end  
-			#if ($paymentline.name == "magcardrefund")
-			#end
-			#if ($paymentline.name == "cheque")
-			#end
-			#if ($paymentline.name == "chequerefund")
-			#end
-			#if ($paymentline.name == "paperin")
-			#end
-			#if ($paymentline.name == "paperout")
-			#end
-			#if ($paymentline.name == "free")
-			#end
-			#if ($paymentline.name == "debt")
-			#end 
 		#end
 		#if (${ticket.ticketType} == 0)
 			#if ($l_typeTicket == "TQ")
