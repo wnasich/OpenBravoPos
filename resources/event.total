@@ -1,0 +1,7 @@
+import javax.swing.JOptionPane;
+
+total = ticket.getTotal();  
+if (total > 300) {
+    JOptionPane.showMessageDialog(null, "Ticket mayor a $300.-\nPresione -Cancelar- en la siguiente pantalla para anular.", "Mensaje de validación del total", JOptionPane.WARNING_MESSAGE);
+}
+
