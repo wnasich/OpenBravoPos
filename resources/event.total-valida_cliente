@@ -1,0 +1,20 @@
+import javax.swing.JOptionPane;
+
+float total = ticket.getTotal();
+Boolean ret = null;
+if (total > 300) {
+    int optionType = JOptionPane.YES_NO_OPTION;
+    int res = JOptionPane.showConfirmDialog(null, "Ticket mayor a $300.-\n¿El importe es correcto?", "Validación del Ticket", optionType);
+    if(res == JOptionPane.NO_OPTION) {
+        ret = false;
+    }
+}
+
+customer = ticket.getCustomer();
+if(customer == null) {
+    JOptionPane.showMessageDialog(null, "No se ha seleccionado el cliente.", "Validación de Reventa", JOptionPane.DEFAULT_OPTION);
+    ret = false;
+}
+
+return ret;
+

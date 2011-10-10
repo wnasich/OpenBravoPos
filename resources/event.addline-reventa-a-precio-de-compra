@@ -1,0 +1,30 @@
+import com.openbravo.pos.ticket.ProductInfoExt; 
+import com.openbravo.data.loader.Session;
+import com.openbravo.pos.forms.DataLogicSales; 
+import com.openbravo.pos.ticket.TicketLineInfo;
+import javax.swing.JOptionPane;
+
+Boolean ret = null;
+String db_url = "jdbc:mysql://localhost/[db-name]?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8";
+String db_user = "[user]";
+String db_pass = "[pass]";
+
+userName = user.getName();
+// Usuario Reventa vende al precio de compra
+if (userName.equals("Reventa")) {
+   customer = ticket.getCustomer();
+   if(customer != null) {
+      Session session = new Session(db_url, db_user, db_pass); 
+      DataLogicSales logic = new DataLogicSales();
+      logic.init(session);
+      ProductInfoExt product = logic.getProductInfo(line.getProductID());
+      resellerPrice = product.getPriceBuy();
+      // Calcula precio de reventa sin el 21% de IVA
+      line.setPrice(resellerPrice/1.21);
+   } else {
+      JOptionPane.showMessageDialog(null, "No se ha seleccionado el cliente.", "Validación de Reventa", JOptionPane.DEFAULT_OPTION);
+      ret = false;
+   }
+}
+
+return ret;
