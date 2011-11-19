@@ -25,14 +25,19 @@
 		#else
 			#set ($letraComprobante = "B")
 		#end
+		
+		#set ($tipoDoc = "CUIT")
+		#if ($custFiscalChar == "F")
+			#set ($tipoDoc = " ")
+		#end
 		<line>@ABRIRCAJON1</line>
 		#if (${ticket.ticketType} == 0)
    		<!-- Cliente -->
    			#set ($customer = $ticket.getCustomer())
-			#if ($customer && $customer.printTaxid())
+			#if ($customer)
 			<!-- Tiquet Factura -->
 				#set ($l_typeTicket = "TF")
-				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |${tipoDoc}|$!{customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}| | | |C</line>
 			#else
 			<!-- Tiquet -->
 				#set ($l_typeTicket = "TQ")
