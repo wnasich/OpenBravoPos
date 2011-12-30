@@ -19,8 +19,10 @@ import ifepson.doc.DataType;
 import ifepson.doc.IndexedOut;
 import ifepson.doc.Parametro;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -478,7 +480,15 @@ public class FiscalEpson {
     public void loadCommands() {
 
         // Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("lib/ifepson.jar", "ifepson.commands");
-        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage("/home/wnasich/NetBeansProjects/ifepson/dist/ifepson.jar", "ifepson.commands");
+        String jarPathToFile = ifCommand.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decodedPath = null;
+        try {
+            decodedPath = URLDecoder.decode(jarPathToFile, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(FiscalEpson.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        // decodedPath = "/home/wnasich/dev/ifepson/dist/ifepson.jar";
+        Class[] commands = myjob.func.classutils.ClassFunc.getClasseInPackage(decodedPath, "ifepson.commands");
 
         Object obj = null;
         ifCommand com = null;
