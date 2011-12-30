@@ -1,0 +1,12 @@
+Carga de Clientes en Openbravo POS con integración de ImpFiscales de Argentina:
+Para Tiquet Factura A/B o Revendedores:
+Campos Obligatorios: 
+CUIT/CUIL/DNI: Obligatorio excepto para -consumidor final-
+Clave de Busqueda
+Nombre
+Categoría de Impuesto
+Dirección/Dirección 1
+Dirección/Dirección 2 (Opcional)
+
+Reponsabilidad frente al IVA se obtiene desde la descripción (última letra) del impuesto relacionado a la categoría de impuesto del cliente.
+
