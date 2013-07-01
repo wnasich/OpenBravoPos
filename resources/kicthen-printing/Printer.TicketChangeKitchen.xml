@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<output>
+    <ticket printer="2">
+		#set ($categoryKitchen = "b9f65850-7560-43bf-845b-c7e2af8a0c10")
+		<line size="1">
+            <text align="left" length="15">MESA EN ATENCION</text>
+        </line>
+        #if ($place != "")
+        <line size="3">
+            <text align="left" length="15">Mesa:</text>
+            <text>${place}</text>
+        </line>  
+		<line></line>
+        #end
+        <line>
+            <text align="left" length="15">Fecha:</text>
+            <text>${ticket.printDate()}</text>
+        </line>  
+        <line>
+            <text align="left" length="45">Item</text>
+            <text align="right" length="4">Cant</text>
+        </line>      
+        #foreach ($ticketline in $ticket.getLines())
+        #if (($ticketline.getProperty("product.categoryid").equals($categoryKitchen) && $ticketline.getProperty("sendstatus").equals("Cancel")) || ($ticketline.getProperty("product.categoryid").equals($categoryKitchen) && $ticketline.getProperty("sendstatus").equals("No"))) 
+        <line size="3">
+			#if ($ticketline.getProperty("sendstatus").equals("No")) 
+				<text align ="left" length="7" bold="true">+</text> 
+			#else 
+				<text align ="left" length="7" bold="true">${ticketline.getProperty("sendstatus")}</text> 
+			#end
+            #if ($ticketline.isProductCom()) 
+                <text align="left" length="20">*${ticketline.printName()}</text>
+            #else
+                <text align="left" length="20">${ticketline.printName()}</text>
+            #end
+            <text align="right" length="4">${ticketline.printMultiply()}</text>
+        </line>
+		<line></line>
+		#end
+        #if ($ticketline.productAttSetInstId)
+        <line>
+	        <text align="left" length="42">    ${ticketline.productAttSetInstDesc}</text>
+        </line>
+        #end
+        #end
+		<line></line>
+        <line size="1">
+            <text>Cant. de Items:</text>
+            <text align="right" length="10">${ticket.printArticlesCount()}</text>
+        </line> 
+		<line></line>
+        <line size="1">
+            <text align="left" length="16">Total:</text>
+            <text align="right" length="20">${ticket.printTotal()}</text>
+        </line>    
+		<line></line>
+		#if ($place != "")
+        <line size="3">
+            <text align="left" length="15">Mesa:</text>
+            <text>${place}</text>
+        </line>  
+		<line></line>
+        #end
+        <line>
+            <text align="left" length="15">Cajero:</text>
+            <text>${ticket.printUser()}</text>
+        </line> 
+    </ticket>
+</output>

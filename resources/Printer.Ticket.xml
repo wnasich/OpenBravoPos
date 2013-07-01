@@ -37,7 +37,7 @@
 			#if ($customer)
 			<!-- Tiquet Factura -->
 				#set ($l_typeTicket = "TF")
-				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |${tipoDoc}|$!{customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}| | | |C</line>
+				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |${tipoDoc}|$!{customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
 			#else
 			<!-- Tiquet -->
 				#set ($l_typeTicket = "TQ")

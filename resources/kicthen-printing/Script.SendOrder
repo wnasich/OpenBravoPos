@@ -1,0 +1,50 @@
+// Print an order ticket to the Kitchen
+ 
+boolean kitchen = false; 
+boolean change_kitchen = false;
+String categoryKitchen = "b9f65850-7560-43bf-845b-c7e2af8a0c10";
+ 
+for(int i= 0; i < ticket.getLinesCount(); i++){  
+	line = ticket.getLine(i); 
+ 
+	if (line.getProperty("sendstatus") == null){ 
+		line.setProperty("sendstatus", "No"); 
+	} 
+
+	if((line.getProperty("product.categoryid").equals(categoryKitchen)) && (line.getProperty("sendstatus").equals("No"))){
+		kitchen = true; //There is something to print to kitchen 
+	} else if ((line.getProperty("product.categoryid").equals(categoryKitchen)) && (line.getProperty("sendstatus").equals("Cancel"))){ 
+		change_kitchen = true; //There is something to change for kitchen
+	} 
+}  
+
+if ((change_kitchen && kitchen) || (change_kitchen && !kitchen)) { 
+	sales.printTicket("Printer.TicketChangeKitchen"); //Print changed kitchen items to kitchen printer 
+} 
+if (kitchen && !change_kitchen) { 
+	sales.printTicket("Printer.TicketKitchen"); //Print kitchen items to kitchen printer 
+} 
+
+//Show a nice message for confirmation 
+if (kitchen){ 
+	javax.swing.JOptionPane.showMessageDialog(null, "Se ha impreso el ticket para cocina.");
+} else { 
+	javax.swing.JOptionPane.showMessageDialog(null, "No hay items para enviar a cocina.", "Print Warning", JOptionPane.WARNING_MESSAGE);
+} 
+
+// Set printkb property of item to Yes so it is not printed again 
+for(int i = ticket.getLinesCount()-1; i>= 0 ; i--) {
+
+	line = ticket.getLine(i); 
+	String a = line.getProperty("sendstatus"); 
+	String b = "Cancel"; 
+
+	if(line.getProperty("product.categoryid").equals(categoryKitchen) && line.getProperty("sendstatus").equals("No")) { 
+		line.setProperty("sendstatus", "Si"); 
+	}
+
+	//Remove cancelled lines
+	if (a.equals(b)) {   
+		ticket.removeLine(i); 
+	} 
+}

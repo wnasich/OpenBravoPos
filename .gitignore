@@ -1,4 +1,8 @@
 *.class
+build
+dist
+lib
+nbproject/private
 
 # Package Files #
 *.jar
