@@ -80,7 +80,7 @@ public class JFrmConfig extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-731)/2, (screenSize.height-679)/2, 731, 679);
+        setBounds((screenSize.width-700)/2, (screenSize.height-500)/2, 700, 500);
     }// </editor-fold>//GEN-END:initComponents
     
     /**
