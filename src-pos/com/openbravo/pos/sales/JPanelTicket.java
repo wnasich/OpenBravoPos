@@ -19,50 +19,23 @@
 
 package com.openbravo.pos.sales;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.util.Date;
-
-import com.openbravo.data.gui.ComboBoxValModel;
-import com.openbravo.data.gui.MessageInf;
-import com.openbravo.pos.printer.*;
-
-import com.openbravo.pos.forms.JPanelView;
-import com.openbravo.pos.forms.AppView;
-import com.openbravo.pos.forms.AppLocal;
-import com.openbravo.pos.panels.JProductFinder;
-import com.openbravo.pos.scale.ScaleException;
-import com.openbravo.pos.payment.JPaymentSelect;
-import com.openbravo.basic.BasicException;
-import com.openbravo.data.gui.ListKeyed;
-import com.openbravo.data.loader.SentenceList;
-import com.openbravo.pos.customers.CustomerInfoExt;
-import com.openbravo.pos.customers.DataLogicCustomers;
-import com.openbravo.pos.customers.JCustomerFinder;
-import com.openbravo.pos.scripting.ScriptEngine;
-import com.openbravo.pos.scripting.ScriptException;
-import com.openbravo.pos.scripting.ScriptFactory;
-import com.openbravo.pos.forms.DataLogicSystem;
-import com.openbravo.pos.forms.DataLogicSales;
-import com.openbravo.pos.forms.BeanFactoryApp;
-import com.openbravo.pos.forms.BeanFactoryException;
-import com.openbravo.pos.inventory.TaxCategoryInfo;
-import com.openbravo.pos.payment.JPaymentSelectReceipt;
-import com.openbravo.pos.payment.JPaymentSelectRefund;
-import com.openbravo.pos.ticket.ProductInfoExt;
-import com.openbravo.pos.ticket.TaxInfo;
-import com.openbravo.pos.ticket.TicketInfo;
-import com.openbravo.pos.ticket.TicketLineInfo;
-import com.openbravo.pos.util.JRPrinterAWT300;
-import com.openbravo.pos.util.ReportUtils;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
 import javax.print.PrintService;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -70,6 +43,39 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRMapArrayDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+
+import com.openbravo.basic.BasicException;
+import com.openbravo.data.gui.ComboBoxValModel;
+import com.openbravo.data.gui.ListKeyed;
+import com.openbravo.data.gui.MessageInf;
+import com.openbravo.data.loader.SentenceList;
+import com.openbravo.pos.customers.CustomerInfoExt;
+import com.openbravo.pos.customers.DataLogicCustomers;
+import com.openbravo.pos.customers.JCustomerFinder;
+import com.openbravo.pos.forms.AppLocal;
+import com.openbravo.pos.forms.AppView;
+import com.openbravo.pos.forms.BeanFactoryApp;
+import com.openbravo.pos.forms.BeanFactoryException;
+import com.openbravo.pos.forms.DataLogicSales;
+import com.openbravo.pos.forms.DataLogicSystem;
+import com.openbravo.pos.forms.JPanelView;
+import com.openbravo.pos.inventory.TaxCategoryInfo;
+import com.openbravo.pos.panels.JProductFinder;
+import com.openbravo.pos.payment.JPaymentSelect;
+import com.openbravo.pos.payment.JPaymentSelectReceipt;
+import com.openbravo.pos.payment.JPaymentSelectRefund;
+import com.openbravo.pos.printer.TicketParser;
+import com.openbravo.pos.printer.TicketPrinterException;
+import com.openbravo.pos.scale.ScaleException;
+import com.openbravo.pos.scripting.ScriptEngine;
+import com.openbravo.pos.scripting.ScriptException;
+import com.openbravo.pos.scripting.ScriptFactory;
+import com.openbravo.pos.ticket.ProductInfoExt;
+import com.openbravo.pos.ticket.TaxInfo;
+import com.openbravo.pos.ticket.TicketInfo;
+import com.openbravo.pos.ticket.TicketLineInfo;
+import com.openbravo.pos.util.JRPrinterAWT300;
+import com.openbravo.pos.util.ReportUtils;
 
 /**
  *
@@ -126,6 +132,8 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     
     private JPaymentSelect paymentdialogreceipt;
     private JPaymentSelect paymentdialogrefund;
+    
+    private int ticketSession = 0;
 
     /** Creates new form JTicketView */
     public JPanelTicket() {
@@ -289,7 +297,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             
             // Refresh ticket taxes
             for (TicketLineInfo line : m_oTicket.getLines()) {
-                line.setTaxInfo(taxeslogic.getTaxInfo(line.getProductTaxCategoryID(), m_oTicket.getDate(), m_oTicket.getCustomer()));
+                line.setTaxInfo(taxeslogic.getTaxInfo(line.getProductTaxCategoryID(), m_oTicket.getCustomer()));
             }  
         
             // The ticket name
@@ -350,7 +358,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
     private void addTicketLine(ProductInfoExt oProduct, double dMul, double dPrice) {   
         
-        TaxInfo tax = taxeslogic.getTaxInfo(oProduct.getTaxCategoryID(),  m_oTicket.getDate(), m_oTicket.getCustomer());
+        TaxInfo tax = taxeslogic.getTaxInfo(oProduct.getTaxCategoryID(), m_oTicket.getCustomer());
         
         addTicketLine(new TicketLineInfo(oProduct, dMul, dPrice, tax, (java.util.Properties) (oProduct.getProperties().clone())));
     }
@@ -388,6 +396,8 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             visorTicketLine(oLine);
             printPartialTotals();   
             stateToZero();  
+            
+            oLine.setSession(ticketSession);
 
             // event receipt
             executeEventAndRefresh("ticket.change");
@@ -436,7 +446,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     
     private double includeTaxes(String tcid, double dValue) {
         if (m_jaddtax.isSelected()) {
-            TaxInfo tax = taxeslogic.getTaxInfo(tcid,  m_oTicket.getDate(), m_oTicket.getCustomer());
+            TaxInfo tax = taxeslogic.getTaxInfo(tcid, m_oTicket.getCustomer());
             double dTaxRate = tax == null ? 0.0 : tax.getRate();           
             return dValue / (1.0 + dTaxRate);      
         } else {
@@ -504,7 +514,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 // Se anade directamente una unidad con el precio y todo
                 if (m_jaddtax.isSelected()) {
                     // debemos quitarle los impuestos ya que el precio es con iva incluido...
-                    TaxInfo tax = taxeslogic.getTaxInfo(oProduct.getTaxCategoryID(),  m_oTicket.getDate(), m_oTicket.getCustomer());
+                    TaxInfo tax = taxeslogic.getTaxInfo(oProduct.getTaxCategoryID(), m_oTicket.getCustomer());
                     addTicketLine(oProduct, 1.0, dPriceSell / (1.0 + tax.getRate()));
                 } else {
                     addTicketLine(oProduct, 1.0, dPriceSell);
@@ -940,6 +950,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 script.put("taxeslogic", taxeslogic);
                 script.put("ticket", ticket);
                 script.put("place", ticketext);
+                script.put("ticketSession", ticketSession++); 
                 m_TTP.printTicket(script.eval(sresource).toString());
             } catch (ScriptException e) {
                 MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotprintticket"), e);
@@ -1190,12 +1201,12 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jPanelCentral = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         m_jPanTotals = new javax.swing.JPanel();
-        m_jTotalEuros = new javax.swing.JLabel();
+        m_jLblTotalEuros3 = new javax.swing.JLabel();
+        m_jLblTotalEuros2 = new javax.swing.JLabel();
         m_jLblTotalEuros1 = new javax.swing.JLabel();
         m_jSubtotalEuros = new javax.swing.JLabel();
         m_jTaxesEuros = new javax.swing.JLabel();
-        m_jLblTotalEuros2 = new javax.swing.JLabel();
-        m_jLblTotalEuros3 = new javax.swing.JLabel();
+        m_jTotalEuros = new javax.swing.JLabel();
         m_jContEntries = new javax.swing.JPanel();
         m_jPanEntries = new javax.swing.JPanel();
         m_jNumberKeys = new com.openbravo.beans.JNumberKeys();
@@ -1218,10 +1229,8 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jTicketId.setBackground(java.awt.Color.white);
         m_jTicketId.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         m_jTicketId.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow")), javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4)));
-        m_jTicketId.setMaximumSize(new java.awt.Dimension(8, 4));
-        m_jTicketId.setMinimumSize(new java.awt.Dimension(8, 4));
         m_jTicketId.setOpaque(true);
-        m_jTicketId.setPreferredSize(new java.awt.Dimension(140, 25));
+        m_jTicketId.setPreferredSize(new java.awt.Dimension(160, 25));
         m_jTicketId.setRequestFocusEnabled(false);
         m_jButtons.add(m_jTicketId);
 
@@ -1291,6 +1300,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jUp.setFocusPainted(false);
         m_jUp.setFocusable(false);
         m_jUp.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jUp.setMaximumSize(new java.awt.Dimension(42, 36));
+        m_jUp.setMinimumSize(new java.awt.Dimension(42, 36));
+        m_jUp.setPreferredSize(new java.awt.Dimension(42, 36));
         m_jUp.setRequestFocusEnabled(false);
         m_jUp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1303,6 +1315,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jDown.setFocusPainted(false);
         m_jDown.setFocusable(false);
         m_jDown.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jDown.setMaximumSize(new java.awt.Dimension(42, 36));
+        m_jDown.setMinimumSize(new java.awt.Dimension(42, 36));
+        m_jDown.setPreferredSize(new java.awt.Dimension(42, 36));
         m_jDown.setRequestFocusEnabled(false);
         m_jDown.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1315,6 +1330,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jDelete.setFocusPainted(false);
         m_jDelete.setFocusable(false);
         m_jDelete.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jDelete.setMaximumSize(new java.awt.Dimension(42, 36));
+        m_jDelete.setMinimumSize(new java.awt.Dimension(42, 36));
+        m_jDelete.setPreferredSize(new java.awt.Dimension(42, 36));
         m_jDelete.setRequestFocusEnabled(false);
         m_jDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1327,6 +1345,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jList.setFocusPainted(false);
         m_jList.setFocusable(false);
         m_jList.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jList.setMaximumSize(new java.awt.Dimension(42, 36));
+        m_jList.setMinimumSize(new java.awt.Dimension(42, 36));
+        m_jList.setPreferredSize(new java.awt.Dimension(42, 36));
         m_jList.setRequestFocusEnabled(false);
         m_jList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1339,6 +1360,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jEditLine.setFocusPainted(false);
         m_jEditLine.setFocusable(false);
         m_jEditLine.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        m_jEditLine.setMaximumSize(new java.awt.Dimension(42, 36));
+        m_jEditLine.setMinimumSize(new java.awt.Dimension(42, 36));
+        m_jEditLine.setPreferredSize(new java.awt.Dimension(42, 36));
         m_jEditLine.setRequestFocusEnabled(false);
         m_jEditLine.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1351,6 +1375,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         jEditAttributes.setFocusPainted(false);
         jEditAttributes.setFocusable(false);
         jEditAttributes.setMargin(new java.awt.Insets(8, 14, 8, 14));
+        jEditAttributes.setMaximumSize(new java.awt.Dimension(42, 36));
+        jEditAttributes.setMinimumSize(new java.awt.Dimension(42, 36));
+        jEditAttributes.setPreferredSize(new java.awt.Dimension(42, 36));
         jEditAttributes.setRequestFocusEnabled(false);
         jEditAttributes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1363,81 +1390,59 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
         m_jPanTicket.add(jPanel5, java.awt.BorderLayout.LINE_END);
 
+        m_jPanelCentral.setPreferredSize(new java.awt.Dimension(450, 240));
         m_jPanelCentral.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        m_jPanTotals.setLayout(new java.awt.GridBagLayout());
+        m_jPanTotals.setPreferredSize(new java.awt.Dimension(450, 60));
+        m_jPanTotals.setLayout(new java.awt.GridLayout(2, 0));
 
-        m_jTotalEuros.setBackground(java.awt.Color.white);
-        m_jTotalEuros.setFont(new java.awt.Font("Dialog", 1, 14));
-        m_jTotalEuros.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        m_jTotalEuros.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow")), javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4)));
-        m_jTotalEuros.setOpaque(true);
-        m_jTotalEuros.setPreferredSize(new java.awt.Dimension(150, 25));
-        m_jTotalEuros.setRequestFocusEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        m_jPanTotals.add(m_jTotalEuros, gridBagConstraints);
+        m_jLblTotalEuros3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        m_jLblTotalEuros3.setLabelFor(m_jSubtotalEuros);
+        m_jLblTotalEuros3.setText(AppLocal.getIntString("label.subtotalcash")); // NOI18N
+        m_jPanTotals.add(m_jLblTotalEuros3);
 
+        m_jLblTotalEuros2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        m_jLblTotalEuros2.setLabelFor(m_jTax);
+        m_jLblTotalEuros2.setText(AppLocal.getIntString("label.taxcash")); // NOI18N
+        m_jPanTotals.add(m_jLblTotalEuros2);
+
+        m_jLblTotalEuros1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        m_jLblTotalEuros1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        m_jLblTotalEuros1.setLabelFor(m_jTotalEuros);
         m_jLblTotalEuros1.setText(AppLocal.getIntString("label.totalcash")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        m_jPanTotals.add(m_jLblTotalEuros1, gridBagConstraints);
+        m_jPanTotals.add(m_jLblTotalEuros1);
 
         m_jSubtotalEuros.setBackground(java.awt.Color.white);
         m_jSubtotalEuros.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         m_jSubtotalEuros.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow")), javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4)));
+        m_jSubtotalEuros.setMaximumSize(new java.awt.Dimension(100, 25));
+        m_jSubtotalEuros.setMinimumSize(new java.awt.Dimension(100, 25));
         m_jSubtotalEuros.setOpaque(true);
-        m_jSubtotalEuros.setPreferredSize(new java.awt.Dimension(150, 25));
+        m_jSubtotalEuros.setPreferredSize(new java.awt.Dimension(80, 25));
         m_jSubtotalEuros.setRequestFocusEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        m_jPanTotals.add(m_jSubtotalEuros, gridBagConstraints);
+        m_jPanTotals.add(m_jSubtotalEuros);
 
         m_jTaxesEuros.setBackground(java.awt.Color.white);
         m_jTaxesEuros.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        m_jTaxesEuros.setLabelFor(m_jTaxesEuros);
         m_jTaxesEuros.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow")), javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4)));
+        m_jTaxesEuros.setMinimumSize(new java.awt.Dimension(100, 25));
         m_jTaxesEuros.setOpaque(true);
-        m_jTaxesEuros.setPreferredSize(new java.awt.Dimension(150, 25));
+        m_jTaxesEuros.setPreferredSize(new java.awt.Dimension(80, 25));
         m_jTaxesEuros.setRequestFocusEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        m_jPanTotals.add(m_jTaxesEuros, gridBagConstraints);
+        m_jPanTotals.add(m_jTaxesEuros);
 
-        m_jLblTotalEuros2.setText(AppLocal.getIntString("label.taxcash")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        m_jPanTotals.add(m_jLblTotalEuros2, gridBagConstraints);
-
-        m_jLblTotalEuros3.setText(AppLocal.getIntString("label.subtotalcash")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        m_jPanTotals.add(m_jLblTotalEuros3, gridBagConstraints);
+        m_jTotalEuros.setBackground(java.awt.Color.white);
+        m_jTotalEuros.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        m_jTotalEuros.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        m_jTotalEuros.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Button.darkShadow")), javax.swing.BorderFactory.createEmptyBorder(1, 4, 1, 4)));
+        m_jTotalEuros.setMinimumSize(new java.awt.Dimension(125, 25));
+        m_jTotalEuros.setOpaque(true);
+        m_jTotalEuros.setPreferredSize(new java.awt.Dimension(100, 25));
+        m_jTotalEuros.setRequestFocusEnabled(false);
+        m_jPanTotals.add(m_jTotalEuros);
 
         jPanel4.add(m_jPanTotals, java.awt.BorderLayout.LINE_END);
 

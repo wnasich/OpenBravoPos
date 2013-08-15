@@ -150,13 +150,19 @@ public class ProductFilterSales extends javax.swing.JPanel implements EditorCrea
         add(jLabel2);
         jLabel2.setBounds(20, 70, 110, 15);
         add(m_jCategory);
-        m_jCategory.setBounds(130, 70, 260, 24);
+        m_jCategory.setBounds(130, 70, 260, 20);
 
         jLabel4.setText(AppLocal.getIntString("label.prodpricebuy")); // NOI18N
         add(jLabel4);
         jLabel4.setBounds(20, 100, 110, 15);
+
+        m_jCboPriceBuy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                m_jCboPriceBuyActionPerformed(evt);
+            }
+        });
         add(m_jCboPriceBuy);
-        m_jCboPriceBuy.setBounds(130, 100, 150, 24);
+        m_jCboPriceBuy.setBounds(130, 100, 150, 20);
         add(m_jPriceBuy);
         m_jPriceBuy.setBounds(290, 100, 130, 25);
 
@@ -164,7 +170,7 @@ public class ProductFilterSales extends javax.swing.JPanel implements EditorCrea
         add(jLabel3);
         jLabel3.setBounds(20, 130, 110, 15);
         add(m_jCboPriceSell);
-        m_jCboPriceSell.setBounds(130, 130, 150, 24);
+        m_jCboPriceSell.setBounds(130, 130, 150, 20);
         add(m_jPriceSell);
         m_jPriceSell.setBounds(290, 130, 130, 25);
         add(m_jtxtBarCode);
@@ -174,6 +180,10 @@ public class ProductFilterSales extends javax.swing.JPanel implements EditorCrea
         add(jLabel1);
         jLabel1.setBounds(20, 10, 110, 15);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void m_jCboPriceBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jCboPriceBuyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_m_jCboPriceBuyActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

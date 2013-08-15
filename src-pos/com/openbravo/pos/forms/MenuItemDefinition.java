@@ -44,7 +44,7 @@ public class MenuItemDefinition implements MenuElement {
         btn.setFocusable(false);
         btn.setRequestFocusEnabled(false);
         btn.setHorizontalAlignment(SwingConstants.LEADING);
-        btn.setPreferredSize(new Dimension(220, 50));
+        btn.setPreferredSize(new Dimension(150, 40));
         
 //        btn.setSize(220, 50);
 //        btn.setLocation(p);
