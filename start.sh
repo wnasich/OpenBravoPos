@@ -45,6 +45,7 @@ CP=$CP:$DIRNAME/lib/substance.jar
 CP=$CP:$DIRNAME/lib/substance-swingx.jar
 CP=$CP:$DIRNAME/lib/ifepson.jar
 CP=$CP:$DIRNAME/lib/log4j-1.2.16.jar
+CP=$CP:$DIRNAME/lib/json-20160212.jar
 
 # Apache Axis SOAP libraries.
 CP=$CP:$DIRNAME/lib/axis.jar
