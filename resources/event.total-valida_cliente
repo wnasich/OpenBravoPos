@@ -2,9 +2,12 @@ import javax.swing.JOptionPane;
 
 float total = ticket.getTotal();
 Boolean ret = null;
-if (total > 300) {
+if (total > 2000) {
+    JOptionPane.showMessageDialog(null, "NO SE PERMITEN TICKETS MAYORES A $2.000.-\n Si es correcta la operación, generar varios tickets de menor importe,\n o en caso contrario corregir el ticket actual.", "Validación del total", JOptionPane.WARNING_MESSAGE);
+    ret = false;
+} else if (total > 800) {
     int optionType = JOptionPane.YES_NO_OPTION;
-    int res = JOptionPane.showConfirmDialog(null, "Ticket mayor a $300.-\n¿El importe es correcto?", "Validación del Ticket", optionType);
+    int res = JOptionPane.showConfirmDialog(null, "Ticket mayor a $800.-\n¿El importe es correcto?", "Validación del Ticket", optionType);
     if(res == JOptionPane.NO_OPTION) {
         ret = false;
     }
@@ -17,4 +20,3 @@ if(customer == null) {
 }
 
 return ret;
-
