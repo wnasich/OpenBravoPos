@@ -25,50 +25,67 @@
 		#else
 			#set ($letraComprobante = "B")
 		#end
-
-		#set ($tipoDoc = "CUIT")
-		#if ($custFiscalChar == "F")
-			#set ($tipoDoc = " ")
-		#end
 		<line>@ABRIRCAJON1</line>
-		#if (${ticket.ticketType} == 0)
+
+		<!-- Tipo de ticket -->
+		#if (${ticket.ticketType} == 0) <!-- Normal -->
+			#set ($tipoDocumento = "T")
+		#elseif (${ticket.ticketType} == 1) <!-- Reembolso -->
+			#set ($tipoDocumento = "M")
+		#end
+
    		<!-- Cliente -->
-   			#set ($customer = $ticket.getCustomer())
-			#if ($customer)
-			<!-- Tiquet Factura -->
-				#set ($l_typeTicket = "TF")
-				<line>@FACTABRE|T|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |${tipoDoc}|$!{customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getCity()}|$!{customer.getRegion()}|--| |C</line>
-			#else
-			<!-- Tiquet -->
-				#set ($l_typeTicket = "TQ")
-				<line>@TIQUEABRE</line>
-			#end
-			<!--
-			#if ($place != "")
-				<line>@LINEACOLA|1|Mesa: ${place}</line>
-			#else
-				<line>@LINEACOLA|1|Expendio</line>
-			#end
-			-->
+		#set ($customer = $ticket.getCustomer())
+		#set ($clienteConCUIT = false)
+		#if ($customer && $customer.printTaxid())
+			#set ($clienteConCUIT = true)
 		#end
+
+		<!-- Tipo de comprobante -->
+		#if ($tipoDocumento == "T" && !$clienteConCUIT)
+			#set ($l_typeTicket = "TQ")
+			<line>@TIQUEABRE</line>
+		#elseif($tipoDocumento == "T" && $clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+		#elseif($tipoDocumento == "M" && !$clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|B|1|F|17|I|F|Consumidor Final| |DNI|0|N|_| | |_|_|C</line>
+		#elseif($tipoDocumento == "M" && $clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+		#end
+
+		<!--
+		#if ($place != "")
+			<line>@LINEACOLA|1|Mesa: ${place}</line>
+		#else
+			<line>@LINEACOLA|1|Expendio</line>
+		#end
+		-->
+
 		<!-- <line>@LINEACOLA|2|Caja: ${ticket.printUser()}</line> -->
-		<!-- Reembolso -->
-		#if (${ticket.ticketType} == 1)
-		#end
 		#foreach ($ticketline in $ticket.getLines())
 			#set ($productName = $ticketline.printName())
 			#if ($productName == "")
 				#set ($productName = "Articulo sin codigo")
 			#end
+
+			#set ($cantidad = ${ticketline.getMultiply()})
+			#if ($tipoDocumento == "M")
+				#set ($cantidad = -1 * $cantidad)
+			#end
+
 			#if ($discriminarIVA)
 				#set ($precioUnitario = ${ticketline.getPrice()})
 			#else
 				#set ($precioUnitario = ${ticketline.getPriceTax()})
 			#end
+
 			#if ($l_typeTicket == "TQ")
-				<line>@TIQUEITEM|${productName}|${ticketline.getMultiply()}|${precioUnitario}|21|M|1|0|0</line>
+				<line>@TIQUEITEM|${productName}|${cantidad}|${precioUnitario}|21|M|1|0|0</line>
 			#elseif($l_typeTicket == "TF")
-				<line>@FACTITEM|${productName}|${ticketline.getMultiply()}|${precioUnitario}|21|M|1|0|0</line>
+				<line>@FACTITEM|${productName}|${cantidad}|${precioUnitario}|21|M|1|0|0</line>
 			#end
 			#if ($ticketline.isProductCom())
 			#else
@@ -78,17 +95,16 @@
 			#if ($paymentline.name == "cash")
 				#if ($l_typeTicket == "TQ")
 					<line>@TIQUEPAGO|Efectivo|${paymentline.getPaid()}|T</line>
-				#elseif($l_typeTicket == "TF")
+				#elseif ($l_typeTicket == "TF")
 					<line>@FACTPAGO|Efectivo|${paymentline.getPaid()}|T</line>
 				#end
 			#end
 		#end
-		#if (${ticket.ticketType} == 0)
-			#if ($l_typeTicket == "TQ")
-				<line>@TIQUECIERRA</line>
-			#elseif($l_typeTicket == "TF")
-				<line>@FACTCIERRA|T|B| </line>
-			#end
+
+		#if ($l_typeTicket == "TQ")
+			<line>@TIQUECIERRA</line>
+		#elseif($l_typeTicket == "TF")
+			<line>@FACTCIERRA|${tipoDocumento}|${letraComprobante}|_</line>
 		#end
 	</fiscalreceipt>
 </output>
