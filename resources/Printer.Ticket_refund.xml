@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<output>
+	<display>
+		<line>
+			<text align="left" length="10">Total.</text>
+			<text align="right" length="10">${ticket.printTotal()}</text>
+		</line>
+		<line>
+			<text align="center" length="20">Gracias por su compra.</text>
+		</line>
+	</display>
+	<fiscalreceipt>
+		<!-- Determinando tipo de Comprobante Fiscal a emitir -->
+		#set ($custFiscalChar = "")
+		#foreach ($taxinfo in $taxes)
+			#set ($taxline = $ticket.getTaxLine($taxinfo))
+			#if ($taxline.getSubTotal() != 0)
+				#set ($custFiscalChar = $taxline.getTaxInfo().getLastCharName())
+			#end
+		#end
+		#set ($discriminarIVA = false)
+		#if ($custFiscalChar == "I")
+			#set ($letraComprobante = "A")
+			#set ($discriminarIVA = true)
+		#else
+			#set ($letraComprobante = "B")
+		#end
+		<line>@ABRIRCAJON1</line>
+
+		<!-- Tipo de ticket -->
+		#if (${ticket.ticketType} == 0) <!-- Normal -->
+			#set ($tipoDocumento = "T")
+		#elseif (${ticket.ticketType} == 1) <!-- Reembolso -->
+			#set ($tipoDocumento = "M")
+		#end
+
+   		<!-- Cliente -->
+		#set ($customer = $ticket.getCustomer())
+		#set ($clienteConCUIT = false)
+		#if ($customer && $customer.printTaxid())
+			#set ($clienteConCUIT = true)
+		#end
+
+		<!-- Tipo de comprobante -->
+		#if ($tipoDocumento == "T" && !$clienteConCUIT)
+			#set ($l_typeTicket = "TQ")
+			<line>@TIQUEABRE</line>
+		#elseif($tipoDocumento == "T" && $clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+		#elseif($tipoDocumento == "M" && !$clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|B|1|F|17|I|F|Consumidor Final| |DNI|0|N|_| | |_|_|C</line>
+		#elseif($tipoDocumento == "M" && $clienteConCUIT)
+			#set ($l_typeTicket = "TF")
+			<line>@FACTABRE|${tipoDocumento}|C|${letraComprobante}|1|F|17|I|${custFiscalChar}|${customer.printName()}| |CUIT|${customer.printTaxid()}|N|$!{customer.getAddress()}|$!{customer.getAddress2()}|_|_|C</line>
+		#end
+
+		<!--
+		#if ($place != "")
+			<line>@LINEACOLA|1|Mesa: ${place}</line>
+		#else
+			<line>@LINEACOLA|1|Expendio</line>
+		#end
+		-->
+
+		<!-- <line>@LINEACOLA|2|Caja: ${ticket.printUser()}</line> -->
+		#foreach ($ticketline in $ticket.getLines())
+			#set ($productName = $ticketline.printName())
+			#if ($productName == "")
+				#set ($productName = "Articulo sin codigo")
+			#end
+
+			#set ($cantidad = ${ticketline.getMultiply()})
+			#if ($tipoDocumento == "M")
+				#set ($cantidad = -1 * $cantidad)
+			#end
+
+			#if ($discriminarIVA)
+				#set ($precioUnitario = ${ticketline.getPrice()})
+			#else
+				#set ($precioUnitario = ${ticketline.getPriceTax()})
+			#end
+
+			#if ($l_typeTicket == "TQ")
+				<line>@TIQUEITEM|${productName}|${cantidad}|${precioUnitario}|21|M|1|0|0</line>
+			#elseif($l_typeTicket == "TF")
+				<line>@FACTITEM|${productName}|${cantidad}|${precioUnitario}|21|M|1|0|0</line>
+			#end
+			#if ($ticketline.isProductCom())
+			#else
+			#end
+		#end
+		#foreach ($paymentline in $ticket.payments)
+			#if ($paymentline.name == "cash")
+				#if ($l_typeTicket == "TQ")
+					<line>@TIQUEPAGO|Efectivo|${paymentline.getPaid()}|T</line>
+				#elseif ($l_typeTicket == "TF")
+					<line>@FACTPAGO|Efectivo|${paymentline.getPaid()}|T</line>
+				#end
+			#end
+		#end
+
+		#if ($l_typeTicket == "TQ")
+			<line>@TIQUECIERRA</line>
+		#elseif($l_typeTicket == "TF")
+			<line>@FACTCIERRA|${tipoDocumento}|${letraComprobante}|_</line>
+		#end
+	</fiscalreceipt>
+</output>
