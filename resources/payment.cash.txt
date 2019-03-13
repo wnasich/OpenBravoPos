@@ -17,14 +17,16 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
 
+payment.addButton("billete.1000pesos", 1000.0);
+payment.addButton("billete.500pesos", 500.0);
+payment.addButton("billete.200pesos", 200.0);
 payment.addButton("billete.100pesos", 100.0);
 payment.addButton("billete.50pesos", 50.0);
 payment.addButton("billete.20pesos", 20.0);
 payment.addButton("billete.10pesos", 10.0);
 payment.addButton("billete.5pesos", 5.0);
-payment.addButton("moneda.1peso", 1.0);
-payment.addButton("moneda.50centavos", 0.50);
-payment.addButton("moneda.25centavos", 0.25);
-payment.addButton("moneda.10centavos", 0.10);
-payment.addButton("moneda.5centavos", 0.05);
-
+//payment.addButton("moneda.1peso", 1.0);
+//payment.addButton("moneda.50centavos", 0.50);
+//payment.addButton("moneda.25centavos", 0.25);
+//payment.addButton("moneda.10centavos", 0.10);
+//payment.addButton("moneda.5centavos", 0.05);
